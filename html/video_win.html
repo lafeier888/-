@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>title</title>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+    <style>
+        body {
+        }
+
+        .error {
+            padding-top: 4rem;
+            font-size: 0.7rem;
+            margin: 1.1rem 0 0;
+            color: #666666;
+            font: 20px/1.5 'Microsoft YaHei', arial, tahoma, \5b8b\4f53, sans-serif;
+            text-align: center;
+        }
+
+        .error i {
+            font-size: 6rem;
+        }
+    </style>
+</head>
+
+<body>
+<header class="aui-bar aui-bar-nav" id="header"
+        style="height:3.2rem;background: rgba(0,0,0,1);color:#fff;position: relative;">
+    <img onclick="ios_inwin('closeWin')" tapmode src="../image/app/rtn.png" style="width: 2.25rem;height: 2.25rem;display: inline;line-height: 2.25rem;position: absolute;left: 0px;"/>
+    <span onclick="ios_inwin('closeWin')" tapmode style="position: absolute;left:2.3rem;text-align: center;line-height: 2.25rem;vertical-align: center" >
+        返回
+      </span>
+    <span onclick="ios_inwin('tuichu')" tapmode style="position: absolute;left:4.6rem;">&nbsp;关闭
+      </span>
+    <span style="position: absolute;right: 60px;" class="shuaxin" onclick="ios_inwin('shuaxin')"
+          tapmode>刷新&nbsp;
+    </span>
+    <span style="position: absolute;right: 10px;color:#F4EA2A;" class="shuaxin" onclick="playVideo()"
+          tapmode>播放
+    </span>
+</header>
+<div id="err"></div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+    var dataurl = '';
+    var dataurl2 = '';
+    var qiyiurl = '';
+    var dcode = 1;
+    var onoff = true;
+    var jx_url1 = localStorage.getItem('jx_url1');
+    var jx_url2 = localStorage.getItem('jx_url2');
+    var jx_url3 = localStorage.getItem('jx_url3');
+    var jx_url4 = localStorage.getItem('jx_url4');
+    var jx_url5 = localStorage.getItem('jx_url5');
+    var jx_url6 = localStorage.getItem('jx_url6');
+    var jx_url7 = localStorage.getItem('jx_url7');
+    var jx_url8 = localStorage.getItem('jx_url8');
+    var jx_url9 = localStorage.getItem('jx_url9');
+    var need_go_away = false;
+    var videoplayurl='';
+
+    var browser;
+    var page_title = "";
+
+
+    apiready = function () {
+        var api_url = localStorage.getItem('api_url');
+        api.parseTapmode();
+        $api.fixStatusBar($api.dom('#header'));
+        var headerPos = $api.offset($api.dom('#header'));
+
+        var body_h = $api.offset($api.dom('body')).h;
+
+        var user_id = localStorage.getItem('user_id');
+        if (user_id > 1) {
+            api.ajax({
+                url: api_url + '/login/login/imei.html',
+                method: 'get',
+                data: {
+                    values: {
+                        uid: user_id
+                    }
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.msg.imei != api.deviceId) {
+                        localStorage.setItem('user_id', '');
+                        localStorage.setItem('user_name', '');
+                        localStorage.setItem('user_time', '');
+                        api.sendEvent({
+                            name: 'newLoingdata',
+                            extra: {}
+                        });
+
+                        api.closeWin({});
+
+                        api.alert({
+                            title: '您已在其他设备登陆！账号已强制下线',
+                            msg: '请重新登陆',
+                        });
+                        return;
+                    }
+                }
+            });
+        }
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            api.hideProgress();
+            api.setScreenOrientation({
+                orientation: 'portrait_up'
+            });
+            var browser = api.require('webBrowser');
+            browser.historyBack(
+                function (ret, err) {
+                    if (!ret.status) {
+                        api.closeWin();
+                    }
+                }
+            );
+        });
+
+        api.parseTapmode();
+        //$api.fixStatusBar($api.dom('.header'));
+        data = api.pageParam;//平台网址
+
+        //打开平台页面
+        api.openFrame({
+            name: 'video_frame',
+            url: api.pageParam.url,
+            progress: {
+                type: "page",
+                color: "#6dd26d"
+            },
+            bgColor: 'widget://icon/an.png',
+            softInputMode: 'pan',
+            rect: {
+                x: 0,
+                y: $api.offset($api.dom('#header')).h,
+                w: 'auto',
+                h: 'auto'
+            },
+            progress: {
+                type: "deafault",
+                title: "橘子影视",
+                text: "欢迎使用"
+            },
+            animation: {
+                type: "fade",
+                subType: "ripple",
+                duration: 300
+            }
+        });
+
+        ios_inwin = function (n) {
+            api.parseTapmode();
+            if (n == 'closeWin') {
+                api.historyBack({
+                    frameName: 'video_frame'
+                }, function (ret, err) {
+                    if (!ret.status) {
+                        api.closeWin({
+                            name: 'video_win'
+                        });
+                    }
+                });
+            } else if (n == 'shuaxin') {
+                var jsfuns = 'history.go(0);';
+                api.execScript({
+                    frameName: 'video_frame',
+                    script: jsfuns
+                });
+            } else if (n == 'tuichu') {
+                api.closeWin({
+                    name: 'video_win'
+                });
+            }
+        };
+        var connectionType = api.connectionType;
+
+
+        api.setFrameClient({
+            frameName: 'video_frame'
+        }, function (ret, err) {
+
+            switch (ret.state) {
+                case 1: //加载进度发生变化
+                    break;
+                case 2: //结束加载
+                    videoplayurl  = ret.url;
+                    showplaybtn(ret.url);
+                    break;
+                case 3:
+                    page_title = ret.title;
+                    break;
+                case 4:
+                    break;
+            }
+        });
+        //点击播放按钮后开始播放视频
+        api.addEventListener({
+            name: 'readyToPlay'
+        }, function (ret, err) {
+            playVideo();//播放
+        });
+    };
+
+    //提供播放按钮
+    function showplaybtn(url) {
+        var data = url;
+        var jsfun = '';
+        if (data.indexOf("iqiyi.com") != -1) {
+            jsfun =
+                "var iframe=document.getElementById('_if');if(iframe){api.toast({msg: '爱奇艺官方错误!稍等自动刷新'});history.go(0)};var i=document.getElementsByClassName('m-video-player-wrap')[0];if(typeof(i) != 'undefined'){i.style.height='220px';i.style.color='#fff';i.style.lineHeight='15';i.style.position='static';i.style.paddingTop='0%';i.style.background='#000000';i.style.textAlign='center';i.innerHTML='<div>视频连接成功,点击播放!</div>';api.toast({msg: '视频连接成功,点击播放!'});i.addEventListener('tap',function(){api.sendEvent({name:'readyToPlay',extra:{herf:window.location.href,title:document.title}})})}";
+        } else if (data.indexOf("v.qq.com") != -1) {
+            jsfun =
+                "var i=document.getElementsByClassName('site_player')[0];if(typeof(i) != 'undefined'){i.style.height='210px';i.style.background='#000000';i.style.textAlign='center';i.style.color='#fff';i.style.lineHeight='14';i.innerHTML='<div>视频连接成功,点击播放!</div>';i.addEventListener('touchstart',function(e){api.sendEvent({name:'readyToPlay',extra:{herf:window.location.href,title:document.title}})})}";
+        } else if (data.indexOf("m.le.com") != -1) {
+            jsfun =
+                "var i=document.getElementsByClassName('playB')[0];if(typeof(i) != 'undefined'){i.style.background='#000000';i.innerHTML='<div>视频连接成功,点击播放!</div>';i.style.width='100%';i.style.textAlign='center';i.style.lineHeight='14';i.style.color='#fff';api.toast({msg: '视频连接成功,点击播放!'});i.addEventListener('touchstart',function(e){api.sendEvent({name:'readyToPlay',extra:{herf:window.location.href,title:document.title}})})}";
+        } else if (data.indexOf("youku.com") != -1) {
+            jsfun =
+                "var i=document.getElementById('playerBox');if(typeof(i) != 'undefined'){i.style.background='#000000';i.style.color='#fff';i.style.textAlign='center';i.style.lineHeight='15';i.innerHTML='<div>视频连接成功,点击播放!</div>';api.toast({msg:'视频连接成功,点击播放!'});i.addEventListener('touchstart',function(e){api.sendEvent({name:'readyToPlay',extra:{herf:window.location.href,title:document.title}})})}";
+        } else if (data.indexOf("mgtv.com") != -1) {
+            jsfun =
+                "var i=document.getElementsByClassName('video-area')[0];if(typeof(i) != 'undefined'){i.style.background='#000000';i.style.color='#fff';i.style.textAlign='center';i.style.lineHeight='16';i.innerHTML='<div>视频连接成功,点击播放!</div>';api.toast({msg: '视频连接成功,点击播放!'});i.addEventListener('click',function(e){api.sendEvent({name:'readyToPlay',extra:{herf:window.location.href,title:document.title}})})}";
+        } else if (data.indexOf("sohu.com") != -1) {
+            jsfun =
+                "var i=document.getElementsByClassName('x-player')[0];var x=document.getElementById('top-poster');if(typeof(i) != 'undefined'){i.style.background='#000000';i.style.color='#fff';i.style.textAlign='center';i.style.lineHeight='13';i.innerHTML='<div>视频连接成功,点击播放!</div>';api.toast({msg: '视频连接成功,点击播放!'});i.addEventListener('touchstart',function(e){api.sendEvent({name:'readyToPlay',extra:{herf:window.location.href,title:document.title}})})}else if(typeof(x) != 'undefined'){x.style.background='#000000';x.style.color='#fff';x.style.height='210px';x.style.textAlign='center';x.style.lineHeight='13';x.innerHTML='<div>视频连接成功,点击播放!</div>';api.toast({msg: '视频连接成功,点击播放!'});x.addEventListener('click',function(){api.sendEvent({name:'readyToPlay',extra:{herf:window.location.href,title:document.title}})})}";
+        } else if (data.indexOf("fun.tv") != -1) {
+            jsfun =
+                "var myVideo=document.getElementById('m-h5v-video-1');if(typeof(myVideo) != 'undefined'){myVideo.pause()};var i=document.getElementById('m-h5v-player-1');if(typeof(i) != 'undefined'){i.style.background='#000000';i.style.color='#fff';i.style.lineHeight='12';i.innerHTML='<div>视频连接成功,点击播放!</div>';api.toast({msg: '视频连接成功,点击播放!'});i.addEventListener('touchstart',function(e){api.sendEvent({name:'readyToPlay',extra:{herf:window.location.href,title:document.title}})})}";
+        } else if (data.indexOf("baofeng.com") != -1) {
+            jsfun =
+                "var myVideo=document.getElementsByTagName('video')[0];myVideo.pause();var i=document.getElementById('videoplayer');if(typeof(i) != 'undefined'){i.style.background='#000000';i.style.textAlign='center';i.style.color='#fff';i.style.lineHeight='17';i.innerHTML='<div>视频连接成功,点击播放!</div>';api.toast({msg: '视频连接成功,点击播放!'});i.addEventListener('touchstart',function(e){api.sendEvent({name:'readyToPlay',extra:{herf:window.location.href,title:document.title}})})}";
+        } else if (data.indexOf("bilibili.com") != -1) {
+            jsfun =
+                "var i=document.getElementById('bofqi');i.style.background='#000000';i.style.lineHeight='10';if(typeof(i) != 'undefined'){i.style.color='#fff';i.style.textAlign='center';i.innerHTML='<div>视频连接成功,点击播放!</div>';api.toast({msg: '视频连接成功,点击播放!'});i.addEventListener('touchstart',function(e){api.sendEvent({name:'readyToPlay',extra:{herf:window.location.href,title:document.title}})})}";
+        } else if (data.indexOf("miguvideo.com") != -1) {
+            jsfun =
+                "var i=document.getElementsByClassName('fixedHeader')[0];if(typeof(i) != 'undefined'){i.style.height='220px';i.style.color='#fff';i.style.fontSize='14px';i.style.lineHeight='15';i.style.background='#000000';i.style.textAlign='center';i.innerHTML='<div>视频连接成功,点击播放!</div>';api.toast({msg: '视频连接成功,点击播放!'});i.addEventListener('touchstart',function(e){api.sendEvent({name:'readyToPlay',extra:{herf:window.location.href,title:document.title}})})}";
+        } else if (data.indexOf("1905.com") != -1) {
+            jsfun =
+                "var i=document.getElementById('player');if(typeof(i) != 'undefined'){i.style.color='#fff';i.style.fontSize='14px';i.style.lineHeight='16';i.style.background='#000000';i.style.textAlign='center';i.innerHTML='<div>视频连接成功,点击播放!</div>';api.toast({msg: '视频连接成功,点击播放!'});i.addEventListener('touchstart',function(e){api.sendEvent({name:'readyToPlay',extra:{herf:window.location.href,title:document.title}})})}";
+        } else if (data.indexOf("17173.com") != -1) {
+            jsfun =
+                "var i=document.getElementById('videoplay');if(typeof(i) != 'undefined'){i.style.color='#fff';i.style.fontSize='14px';i.style.lineHeight='16';i.style.background='#000000';i.style.textAlign='center';i.innerHTML='<div>视频连接成功,点击播放!</div>';api.toast({msg: '视频连接成功,点击播放!'});i.addEventListener('touchstart',function(e){api.sendEvent({name:'readyToPlay',extra:{herf:window.location.href,title:document.title}})})}";
+        } else if (data.indexOf("pptv.com") != -1) {
+            jsfun =
+                "var i=document.getElementById('playerbox');if(typeof(i) != 'undefined'){i.style.color='#fff';i.style.lineHeight='12';i.style.background='#000000';i.style.textAlign='center';i.innerHTML='<div>视频连接成功,点击播放!</div>';api.toast({msg: '视频连接成功,点击播放!'});i.addEventListener('touchstart',function(e){api.sendEvent({name:'readyToPlay',extra:{herf:window.location.href,title:document.title}})})}";
+        }
+
+        api.execScript({
+            frameName: 'video_frame',
+            script: jsfun
+        });
+    }
+
+    function getCaption(obj) {
+        var index = obj.lastIndexOf("\=");
+        obj = obj.substring(index + 1, obj.length);
+        return obj;
+    }
+
+    function huanxian() {
+        //alert(dataurl2);
+        var user_id = localStorage.getItem('user_id');
+        if (user_id < 1) {
+            api.alert({
+                title: '温馨提示',
+                msg: '请先登陆后使用',
+            });
+            api.openWin({
+                name: 'login',
+                url: './login.html',
+                delay: 300
+            });
+            return;
+
+        }
+        api.showProgress({
+            title: '获取VIP信息',
+            modal: false
+        });
+        var browser = api.require('webBrowser');
+        api.execScript({
+            frameName: 'video_frame',
+            script: 'location.reload();'
+        });
+        need_go_away = true;
+
+    }
+
+    function playVideo() {
+        api.hideProgress();
+        var systemType = api.systemType;
+        if (systemType == 'ios') {
+            console.log("正在使用苹果设备...")
+            api.openWin({
+                name: 'play_win',
+                url: './play_win.html',
+                delay: 300,
+                pageParam: {
+                    url: jx_url1 + videoplayurl,
+                    title: page_title,
+                    srcUrl:videoplayurl,
+                    needRecordHistory: true
+                },
+                //pageParam:{url:dataurl2},
+                bgColor: '#000000'
+            });
+        } else if (systemType == 'android') {
+            console.log("正在使用安卓设备..." + jx_url1 + videoplayurl)
+            api.openWin({
+                name: 'play_win',
+                url: './play_win.html',
+                delay: 300,
+                pageParam: {
+                    url: jx_url1 + videoplayurl,
+                    title: page_title,
+                    needRecordHistory: true
+                },
+                bgColor: '#000000'
+            });
+        } else {
+            console.log('浏览器');
+            var browser = api.require('webBrowser');
+            browser.open({
+                url: jx_url2 + dataurl2,
+                titleBar: {
+                    visible: true
+                }
+            });
+
+        }
+    }
+
+    function getParam(name) {
+
+        return dataurl2.match(new RegExp('[?&]' + name + '=([^?&]+)', 'i')) ? decodeURIComponent(RegExp.$1) : '';
+
+    }
+
+    function closeWin() {
+        var browser = api.require('webBrowser');
+        browser.historyBack(
+            function (ret, err) {
+                if (!ret.status) {
+                    api.closeWin();
+                }
+            }
+        );
+    }
+
+    function closeWd() {
+        api.closeWin();
+    }
+
+    function vipHuanxian(jiekou) {
+        alert("ddd" + dataurl2);
+        var user_id = localStorage.getItem('user_id');
+        if (user_id < 1) {
+            api.alert({
+                title: '温馨提示',
+                msg: '请先登陆后使用',
+            });
+            api.openWin({
+                name: 'login',
+                url: './login.html',
+                delay: 300
+            });
+            return;
+
+        }
+
+        var systemType = api.systemType;
+        if (systemType == 'android') {
+            api.openWin({
+                name: 'play_win',
+                url: './play_win.html',
+                delay: 300,
+                pageParam: {
+                    url: jiekou + dataurl2
+                },
+                bgColor: '#000000'
+            });
+        } else {
+            var browser = api.require('webBrowser');
+            browser.open({
+                url: jiekou + dataurl2,
+                titleBar: {
+                    visible: true
+                }
+            });
+
+        }
+
+    }
+</script>
+
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" style="height:100%;width:100%">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+</head>
+<body style="height:100%;width:100%">
+<iframe id='iframe' src="" width="100%" height="100%" frameborder="0"></iframe>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script>
+    apiready = function () {
+
+        $api.byId('iframe').src = api.pageParam.url
+
+
+        api.setScreenOrientation({
+            orientation: 'landscape_right'
+        });
+
+        api.toast({
+            msg: '加载时间较长,请耐心等待!',
+            duration: 5000,
+            location: 'bottom'
+        });
+
+        api.openWin({
+            name: 'videocloud',
+            url: api.pageParam.url
+        });
+        console.log(api.pageParam.url);
+
+
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            api.hideProgress();
+
+
+            api.closeWin({
+                name: 'videocloud'
+            });
+            api.toast({
+                msg: '已关闭',
+                duration: 2000,
+                location: 'bottom'
+            });
+            api.setScreenOrientation({
+                orientation: 'auto'
+            });
+
+
+        });
+    }
+</script>
+</html>

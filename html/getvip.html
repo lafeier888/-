@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/api.css" />
+    <title>Title</title>
+</head>
+<body>
+<header class="aui-navBar aui-navBar-fixed" style="" id="aui-header">
+    <a  onclick="closeWin()" class="aui-navBar-item"  >
+        <i class="icon icon-back"></i>
+    </a>
+    <div class="aui-center">
+        <span class="aui-center-title"   id="title"  >  获取vip</span>
+    </div>
+
+
+
+
+</header>
+<div id="getvipcontent">
+    添加客服微信  juzikefu168 备注：获取vip即可
+</div>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script>
+    function closeWin(){
+        api.closeWin({
+        });
+    }
+    apiready = function() {
+        var api_url = localStorage.getItem('api_url');
+        $api.fixStatusBar($api.dom('header'));
+        api.ajax({
+            url: api_url + '/app/index/getvip.html',
+            method: 'get',
+        }, function (ret, err) {
+
+            if (ret) {
+                console.log(ret.content)
+                $api.dom('#getvipcontent').innerHTML =  ret.content
+            }else{
+                console.log(err.msg)
+                console.log(err.body)
+            }
+        });
+    }
+</script>
+</html>

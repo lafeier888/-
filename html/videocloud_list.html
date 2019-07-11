@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <!-- 引入vue -->
+    <script src="../script/vue.min.js"></script>
+    <script src="../script/vue-resource.min.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/api.css" />
+    <style>
+        body {
+            padding-top: 10px;
+            font-size: 10px;
+        }
+
+        .info-margin-bottom {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <el-container>
+            <el-header>
+                <el-row :gutter="5">
+                    <el-col :span="20">
+                        <el-input v-model="searchword" placeholder="请输入内容"></el-input>
+                    </el-col>
+                    <el-col :span="1">
+                        <el-button icon="el-icon-search" circle v-on:click="search"></el-button>
+                    </el-col>
+                </el-row>
+            </el-header>
+            <el-main>
+                <el-row :gutter="2">
+
+                    <el-col :span="8" v-for="data in datalist" class="info-margin-bottom">
+                        <a v-on:click="openplaypage(data)"><img v-bind:src="data.pic" width="100%" height="150px" /></a>
+                        <div align="center" style="width: 100%;height: 1rem;overflow: hidden">{{data.name}}</div>
+                    </el-col>
+
+                </el-row>
+            </el-main>
+        </el-container>
+    </div>
+
+</body>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: function() {
+            return {
+                searchword: "",
+                datalist: null
+
+            }
+        },
+        methods: {
+            search:function() {
+                //发送get请求
+                this.$http.get('http://video.gotohard.cn/index/videocloud/search/word/' + this.searchword + '.html').then(function(res) {
+                    this.datalist = res.body
+                }, function() {
+                    console.log('请求失败处理');
+                })
+            },
+            openplaypage:function(data) {
+
+                api.openWin({
+                    name: 'videocloud_play',
+                    url: './videocloud_play.html',
+                    pageParam: {
+                        data: data
+                    },rect: {
+                        x: 0,
+                        y: 0,
+                        w: api.winWidth,
+                        h: 'auto'
+                    }
+                });
+            }
+        }
+    })
+</script>
+<script type="text/javascript" src="../script/api.js"></script>
+<script>
+
+    apiready = function() {
+        $api.fixStatusBar($api.dom('#app'));
+        api.toast({
+            msg: '正在加载,不要着急呀~',
+            duration: 5000,
+            location: 'bottom'
+        });
+
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            api.hideProgress();
+
+
+            api.closeWin({
+                name: 'searchpage'
+            });
+
+        });
+    }
+</script>
+
+</html>

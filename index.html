@@ -1,0 +1,672 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>底部导航</title>
+    <link rel="stylesheet" type="text/css" href="./css/api.css" />
+    <link rel="stylesheet" type="text/css" href="./css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="./css/style.css" />
+    <link rel="stylesheet" type="text/css" href="./css/iconfont.css">
+    <style>
+        header {
+            background: linear-gradient(to right, #ff5e3e 0, #ff1679 100%);
+        }
+
+        header ul li {
+            height: 2.25rem;
+            line-height: 2.25rem;
+            text-align: center;
+            display: none;
+            color: #333;
+            position: relative;
+            font-size: 0.9rem;
+        }
+
+        header ul li.active {
+            display: block;
+        }
+        /*      #footer{  border-radius: 30px 30px 0px 0px;box-shadow: 0.01rem 0.15rem 1rem 1px rgba(0, 0, 0, 0.1);}  */
+
+        #footer ul li {
+            height: 2.25rem;
+            padding-top: 1.25rem;
+            padding-bottom: 1px;
+            background: url() no-repeat center 2px;
+            font-size: 0.6rem;
+            background-size: auto 1.1rem;
+            text-align: center;
+        }
+
+        #footer ul li.active {
+            color: #f52737;
+        }
+
+        #footer ul li:nth-child(1) {
+            background-image: url(./image/shouye.png);
+        }
+
+        #footer ul li:nth-child(2) {
+            background-image: url(./image/zhibo.png);
+        }
+
+        #footer ul li:nth-child(3) {
+            background-image: url(./image/meng.png);
+            background-size: 2rem;
+        }
+
+        #footer ul li:nth-child(4) {
+            background-image: url(./image/faxian.png);
+        }
+
+        #footer ul li:nth-child(5) {
+            background-image: url(./image/wode.png);
+        }
+
+        #footer ul li:nth-child(1).active {
+            background-image: url(./image/shouye2.png);
+        }
+
+        #footer ul li:nth-child(2).active {
+            background-image: url(./image/zhibo2.png);
+        }
+
+        #footer ul li:nth-child(3).active {
+            background-image: url(./image/meng.png);
+            background-size: 2rem;
+        }
+
+        #footer ul li:nth-child(4).active {
+            background-image: url(./image/faxian2.png);
+        }
+
+        #footer ul li:nth-child(5).active {
+            background-image: url(./image/wode2.png);
+        }
+
+        .flex-con {
+            overflow: auto;
+            background-color: #fff;
+        }
+    </style>
+    <script type="text/javascript">
+        localStorage.setItem('api_url', "http://video.gotohard.cn");
+    </script>
+</head>
+
+<body>
+    <div id="wrap" class="flex-wrap flex-vertical">
+        <!-- 每个选项卡的标题 -->
+        <header class="aui-navBar aui-navBar-fixed">
+            <ul>
+                <li class="border-b active"><a class="aui-navBar-item masked" id="tietle" style="color: #212121;">影视大全</a>
+                </li>
+                <li class="border-b"><a class="aui-navBar-item">影视大厅</a></li>
+                <li style="display: none" class="border-b">
+                    <a class="aui-navBar-item"></a>
+                </li>
+                <li class="border-b"><a class="aui-navBar-item">福利中心</a></li>
+                <li class="border-b"><a class="aui-navBar-item">会员中心</a></li>
+            </ul>
+            <!-- 标题 -->
+            <div class="aui-center">
+                <span class="aui-center-title"></span>
+            </div>
+            <!-- 默认右上角广告位 -->
+            <a class="aui-navBar-item" id="hbbox">
+                <img src="./image/search.png" style="position: absolute;width: 1.5rem;top: 0.3rem;right: 0.5rem;" tapmode onClick="opensearch()">
+            </a>
+
+
+        </header>
+
+        <div id="main" class="flex-con">
+
+        </div>
+
+        <!-- //底部选项卡 -->
+
+        <div id="footer" class="border-t">
+            <ul class="flex-wrap" style="font-weight:bold">
+                <li tapmode="hover" onclick="randomSwitchBtn( this );" class="flex-con active">首页</li>
+                <li tapmode="hover" onclick="randomSwitchBtn( this );" class="flex-con">直播</li>
+                <li style="display: none" tapmode="hover" onclick="randomSwitchBtn( this );" class="flex-con"></li>
+                <li tapmode="hover" onclick="randomSwitchBtn( this );" class="flex-con">福利</li>
+                <li tapmode="hover" onclick="randomSwitchBtn( this );" class="flex-con">会员</li>
+            </ul>
+
+        </div>
+    </div>
+
+    <!-- 右上角广告位 -->
+    <script type="text/x-dot-template" id="hongbaotpl">
+        {{=it.name}}<img src="http://video.gotohard.cn/{{=it.picurl}}" style="width: 1.5rem;top: 0.3rem;right: 0.5rem;" onclick="toBanner('{{=it.linkurl}}')">
+    </script>
+
+    <script type="text/javascript" src="script/api.js"></script>
+    <script type="text/javascript" src="script/doT.js"></script>
+    <script type="text/javascript" src="script/auipullrefresh.js"></script>
+    <script type="text/javascript" src="script/auislide.js"></script>
+    <script type="text/javascript" src="script/auilazyload.js"></script>
+    <script type="text/javascript">
+        // var hongbaoid = $api.byId('hbbox');//右上角广告
+        // var hongbaotpl = $api.byId('hongbaotpl');
+
+        var api_url = localStorage.getItem('api_url');
+        var uid = '';
+
+        apiready = function() {
+            init(); //初始化
+            connectToNetwork(); //连接网络时触发
+            unconnectToNetwork(); //断开网络触发
+            GetfunIniGroup(); //初始化底部选项卡
+
+            var push = api.require('push');
+            push.setListener(function(ret, err) {
+                if (ret) {
+
+                    api.toast({
+                        msg: JSON.stringify(ret.data[0]),
+                        duration: 10000,
+                        location: 'bottom'
+                    });
+
+                } else {
+                    console.log(JSON.stringify(err));
+                }
+            });
+            //监听刷新配置的事件
+            api.addEventListener({
+                name: 'refreshConfig'
+            }, function(ret, err) {
+                getconfig(); //获取系统配置
+            });
+
+        }
+
+
+
+
+        function VipExpiredHint() {
+            /*会员过期弹窗提示*/
+            var dialogBox = api.require('dialogBox');
+            dialogBox.alert({
+                tapClose: true, //描述：（可选项）是否点击遮罩层关闭该对话框  默认值：false
+                texts: {
+                    content: '超级视频VIP已过期',
+                    leftBtnTitle: '我知道了',
+                    rightBtnTitle: '升级会员'
+                },
+                styles: {
+                    bg: '#fff', //（可选项）字符串类型；对话框整体背景配置，支持#、rgb、rgba、img；默认：#fff
+                    corner: 10, //（可选项）数字类型；对话框背景圆角大小；默认：2
+                    w: 300, //（可选项）数字类型；对话框的宽；默认：300
+                    title: { //（可选项）JSON对象；弹窗标题栏样式配置，不传则不显示标题区域
+                        marginT: 20, //（可选项）数字类型；标题栏与对话框顶端间距；默认：20
+                        icon: 'widget://image/app/VipExpiredTisi.png', //（可选项）字符串类型；标题前面的图标路径，要求本地路径（widget://、fs://）；图片为正方形的，如：50*50、100*100，建议开发者传大小合适的图片以适配高分辨率手机屏幕，不传则不显示
+                        iconSize: 80, //（可选项）数字类型；icon 图标边长大小,若 icon 不存在则此参数无效；默认：24
+                        titleSize: 14, //（可选项）数字类型；标题字体大小；默认：14
+                        titleColor: '#000' //（可选项）字符串类型；标题字体颜色，支持#、rgb、rgba；默认：#fff
+                    },
+                    content: { //（可选项）JSON 对象；文本内容配置，若不传则不显示该区域
+                        marginT: 20, //（可选项）数字类型；内容文本顶端与标题栏底端的距离，如果标题栏不存在，则是到窗口顶端的距离；默认：20
+                        marginB: 40, //（可选项）数字类型；内容文本底端与 left/right 顶端的距离，如果 left/right 都不存在，则是到对话框底端的距离；默认：20
+                        color: '#ff0072', //（可选项）字符串类型；内容文本字体颜色，支持 rgb、rgba、#；默认：#eee
+                        size: 12 //（可选项）数字类型：内容文本字体大小；默认：12
+                    },
+                    left: { //（可选项）JSON 对象；左边按钮样式配置，不传则不显示左边按钮
+                        marginB: 30, //（可选项）数字类型；左边按钮的下边距；默认：7
+                        marginL: 30, //（可选项）数字类型；左边按钮的左边距；默认：20
+                        w: 100, //（可选项）数字类型；左边按钮的宽；默认：130
+                        h: 40, //（可选项）数字类型；左边按钮的高；默认：35
+                        corner: 10, //（可选项）数字类型；左边按钮圆角半径；默认：0.0
+                        bg: '#3d3d3d', //（可选项）字符串类型；左边按钮的背景，支持rgb、rgba、#、img；默认：'#e0e'
+                        color: '#fff', //（可选项）字符串类型；左边按钮标题字体颜色，支持rgb，rgba、#；默认：'#007FFF'
+                        size: 12 //（可选项）数字类型；左边按钮标题字体大小；默认：12
+                    },
+                    right: { //（可选项）JSON 对象；右边按钮样式配置，不传则不显示右边按钮
+                        marginB: 30, //（可选项）数字类型；右边按钮的下边距；默认：7
+                        marginL: 40, //（可选项）数字类型；右边按钮左边距；默认：10
+                        w: 100, //（可选项）数字类型；右边按钮的宽；默认：130
+                        h: 40, //（可选项）数字类型；右边按钮的高；默认：35
+                        corner: 10, //（可选项）数字类型；右边按钮圆角半径；默认：0.0
+                        bg: '#ff0072', //（可选项）字符串类型；右边按钮的背景，支持rgb、rgba、#、img；默认：'#e0e'
+                        color: '#fff', //（可选项）字符串类型；右边按钮标题字体颜色，支持rgb、rgba、#；默认：'#007FFF'
+                        size: 12 //（可选项）数字类型；右边按钮标题字体大小；默认：12
+                    }
+                }
+            }, function(ret) {
+                if (ret.eventType == 'left') {
+
+                    var dialogBox = api.require('dialogBox');
+                    dialogBox.close({
+                        dialogName: 'alert'
+                    });
+                } else if (ret.eventType == 'right') {
+                    api.openWin({
+                        name: 'open_vip_win',
+                        url: './html/open_vip_win.html',
+                        delay: 300
+                    });
+                    var dialogBox = api.require('dialogBox');
+                    dialogBox.close({
+                        dialogName: 'alert'
+                    });
+                }
+            });
+            /*    会员过期弹窗提示结束    */
+
+        }
+
+        function logincheck2() {
+            console.log("登录检查")
+            var time = localStorage.getItem('user_time');
+            var user_id = localStorage.getItem('user_id');
+            var timestamp = Date.parse(new Date()) / 1000;
+            if (user_id < 1) {
+                api.toast({
+                    msg: '(ｷ｀ﾟДﾟ´)!!    你还没登陆！',
+                    duration: 2000
+                });
+                api.openWin({
+                    name: 'login',
+                    url: './html/login.html',
+                    delay: 500
+                });
+                return false;
+            }
+            if (time > timestamp || time == -1) {
+                api.ajax({
+                    url: api_url + '/login/login/banben.html',
+                    method: 'get'
+                }, function(ret, err) {
+                    if (ret) {
+                        api.toast({
+                            msg: 'VIP登录'
+                        });
+                    } else {
+                        api.toast({
+                            msg: '请检查网络是否畅通'
+                        });
+                    }
+                });
+                return true;
+            } else if (time < timestamp) {
+                VipExpiredHint(); // 会员过期弹窗提示
+                return false;
+            }
+        }
+
+        function opensearch() {
+            if (logincheck2()) {
+                api.openWin({
+                    name: 'searchpage',
+                    url: './html/videocloud_list.html',
+                    pageParam: {}
+                });
+            }
+
+        }
+
+        //刷新调用初始化
+        function init() {
+            logincheck();
+            getconfig(); //获取系统配置
+            GetTitleData(); //修改页面标题
+            rightUpAd(); //右上角广告
+
+        }
+
+
+        // 连接网络事件监听
+        function connectToNetwork() {
+            api.addEventListener({
+                name: 'online'
+            }, function(ret, err) {
+                var dialogBox = api.require('dialogBox');
+                dialogBox.close({
+                    dialogName: 'alert'
+                });
+
+                GetTitleData(); //顶部标题和红包
+                GetfunIniGroup(); //底部选项卡
+
+                api.toast({
+                    msg: '网络已连接',
+                    duration: 5000
+                });
+
+            });
+
+
+        }
+
+        //断网事件监听
+        function unconnectToNetwork() {
+
+            api.addEventListener({
+                name: 'offline'
+            }, function(ret, err) {
+                ConnectionDetectionWithServer();
+            });
+            $api.fixStatusBar($api.dom('header'));
+            api.setStatusBarStyle({
+                style: 'light',
+                color: 'rgba(0,0,0,0.3)'
+            });
+            if (localStorage.getItem('user_id') > 1) {
+                uid = localStorage.getItem('user_id');
+            } else {
+                uid = 0;
+            }
+        }
+
+        //登录检查
+        function logincheck() {
+            var user_id = localStorage.getItem('user_id');
+            if (user_id > 1) {
+                api.ajax({
+                    url: api_url + '/login/login/imei.html',
+                    method: 'get',
+                    data: {
+                        values: {
+                            uid: user_id
+                        }
+                    }
+                }, function(ret, err) {
+                    if (ret) {
+                        //在其他设备同时登录
+                        if (ret.data.imei != api.deviceId) {
+                            localStorage.setItem('user_id', '');
+                            localStorage.setItem('user_name', '');
+                            localStorage.setItem('user_time', '');
+                            api.sendEvent({
+                                name: 'newLoingdata',
+                                extra: {}
+                            });
+
+                            var dialogBox = api.require('dialogBox');
+                            dialogBox.alert({
+                                tapClose: true, //描述：（可选项）是否点击遮罩层关闭该对话框  默认值：false
+                                texts: {
+                                    content: '您已在其他设备登录',
+                                },
+                                styles: {
+                                    bg: '#fff', //（可选项）字符串类型；对话框整体背景配置，支持#、rgb、rgba、img；默认：#fff
+                                    corner: 10, //（可选项）数字类型；对话框背景圆角大小；默认：2
+                                    w: 300, //（可选项）数字类型；对话框的宽；默认：300
+                                    title: { //（可选项）JSON对象；弹窗标题栏样式配置，不传则不显示标题区域
+                                        marginT: 20, //（可选项）数字类型；标题栏与对话框顶端间距；默认：20
+                                        icon: 'widget://image/app/dialogBoxTisi.jpg', //（可选项）字符串类型；标题前面的图标路径，要求本地路径（widget://、fs://）；图片为正方形的，如：50*50、100*100，建议开发者传大小合适的图片以适配高分辨率手机屏幕，不传则不显示
+                                        iconSize: 80, //（可选项）数字类型；icon 图标边长大小,若 icon 不存在则此参数无效；默认：24
+                                        titleSize: 14, //（可选项）数字类型；标题字体大小；默认：14
+                                        titleColor: '#000' //（可选项）字符串类型；标题字体颜色，支持#、rgb、rgba；默认：#fff
+                                    },
+                                    content: { //（可选项）JSON 对象；文本内容配置，若不传则不显示该区域
+                                        marginT: 20, //（可选项）数字类型；内容文本顶端与标题栏底端的距离，如果标题栏不存在，则是到窗口顶端的距离；默认：20
+                                        marginB: 40, //（可选项）数字类型；内容文本底端与 left/right 顶端的距离，如果 left/right 都不存在，则是到对话框底端的距离；默认：20
+                                        color: '#ff0103', //（可选项）字符串类型；内容文本字体颜色，支持 rgb、rgba、#；默认：#eee
+                                        size: 12 //（可选项）数字类型：内容文本字体大小；默认：12
+                                    },
+
+                                }
+                            });
+                            return;
+                        } else {
+                            localStorage.setItem('user_name', ret.data.username);
+                            localStorage.setItem('user_time', ret.data.lasttime); //用户过期时间
+
+                        }
+
+                    } else {
+
+                    }
+                });
+            }
+        }
+
+        //打开一个页面
+        function toBanner(url) {
+            api.openWin({
+                name: 'haosheng_win',
+                url: 'html/haosheng_win.html',
+                delay: 800,
+                pageParam: {
+                    url: url
+                },
+                bgColor: 'rgba(0,0,0,0)'
+            }); //选项卡切换回调
+        }
+
+        //切换选项卡
+        function randomSwitchBtn(tag) {
+            if (tag == $api.dom('#footer li.active')) return;
+            var eFootLis = $api.domAll('#footer li'),
+                eHeaderLis = $api.domAll('header li'),
+                index = 0;
+            for (var i = 0, len = eFootLis.length; i < len; i++) {
+                if (tag == eFootLis[i]) {
+                    index = i;
+                } else {
+                    $api.removeCls(eFootLis[i], 'active');
+                    $api.removeCls(eHeaderLis[i], 'active');
+                }
+            }
+            $api.addCls(eFootLis[index], 'active');
+            $api.addCls(eHeaderLis[index], 'active');
+            api.setFrameGroupIndex({
+                name: 'group',
+                index: index
+            });
+            //打开关闭抖音
+            if (index == 2) {
+                api.openFrame({
+                    name: 'page1',
+                    url: 'https://h5.kuaiyinshi.com',
+                    bounces: true,
+                    rect: {
+                        x: 0,
+                        y: 0,
+                        //y: $api.dom('header').offsetHeight,
+                        w: api.winWidth,
+                        h: $api.dom('#main').offsetHeight + $api.dom('header').offsetHeight
+                    },
+                    allowEdit: true,
+                })
+                return;
+            } else {
+                api.closeFrame({
+                    name: 'page1'
+                });
+            }
+        }
+
+        function UnloadedCompleted() {
+
+            api.toast({
+                msg: '请检查网络是否畅通'
+            });
+        }
+
+        //修改标题
+        function GetTitleData() {
+
+            tietle.innerHTML = localStorage.getItem('app_name')
+        }
+
+        //获取配置信息
+        function getconfig() {
+            // app配置
+            api.ajax({
+                url: api_url + '/app/config/appconfig',
+                method: 'get',
+            }, function(ret, err) {
+                if (ret) {
+                    localStorage.setItem('weichat', ret.weichat.content)
+                }
+
+            });
+            // 系统配置
+            api.ajax({
+                url: api_url + '/app/config/sysconfig',
+                method: 'get',
+            }, function(ret, err) {
+                if (ret) {
+                    localStorage.setItem('app_name', ret.app_name.content)
+                    localStorage.setItem('app_index_ad', ret.app_index_ad.content)
+                    localStorage.setItem('app_download_url', ret.app_download_url.content)
+                    localStorage.setItem('share_url', ret.share_url.content)
+
+
+                    localStorage.setItem('jx_url1', ret.resolveInterface_1.content)
+                    localStorage.setItem('jx_url2', ret.resolveInterface_2.content)
+                    localStorage.setItem('jx_url3', ret.resolveInterface_3.content)
+                    localStorage.setItem('jx_url4', ret.resolveInterface_4.content)
+                    localStorage.setItem('jx_url5', ret.resolveInterface_5.content)
+                    localStorage.setItem('jx_url6', ret.resolveInterface_6.content)
+                    localStorage.setItem('jx_url7', ret.resolveInterface_7.content)
+                    localStorage.setItem('jx_url8', ret.resolveInterface_8.content)
+                    localStorage.setItem('jx_url9', ret.resolveInterface_9.content)
+                }
+
+            });
+        }
+
+        //右上角图片以及连接地址
+        function rightUpAd() {
+
+            api.ajax({
+                url: api_url + '/app/nav',
+                method: 'get',
+            }, function(ret, err) {
+                if (ret) {
+                    //渲染模板
+                    // var pagefn = doT.template(hongbaotpl.text);
+                    // //    ret.hb['name']=localStorage.getItem('na');
+                    // //    hongbaoid.innerHTML = pagefn(ret.hb);
+                    // hongbaoid.innerHTML = pagefn(ret.hb);
+
+                }
+                /*  去掉无网络弹窗提示
+
+                            else {
+                                    alert( '网络错误' );
+                                    api.hideProgress();
+                                }
+                            */
+            });
+        }
+
+        //无网络事件处理函数
+        function ConnectionDetectionWithServer() {
+
+            /*无网络弹窗提示*/
+            var dialogBox = api.require('dialogBox');
+            dialogBox.alert({
+                tapClose: false, //描述：（可选项）是否点击遮罩层关闭该对话框  默认值：false
+                texts: {
+                    content: '请检查网络是否畅通',
+                    rightBtnTitle: '网络设置'
+                },
+                styles: {
+                    bg: '#fff', //（可选项）字符串类型；对话框整体背景配置，支持#、rgb、rgba、img；默认：#fff
+                    corner: 10, //（可选项）数字类型；对话框背景圆角大小；默认：2
+                    w: 300, //（可选项）数字类型；对话框的宽；默认：300
+                    title: { //（可选项）JSON对象；弹窗标题栏样式配置，不传则不显示标题区域
+                        marginT: 20, //（可选项）数字类型；标题栏与对话框顶端间距；默认：20
+                        icon: 'widget://image/app/NoNetworkTisi.png', //（可选项）字符串类型；标题前面的图标路径，要求本地路径（widget://、fs://）；图片为正方形的，如：50*50、100*100，建议开发者传大小合适的图片以适配高分辨率手机屏幕，不传则不显示
+                        iconSize: 80, //（可选项）数字类型；icon 图标边长大小,若 icon 不存在则此参数无效；默认：24
+                        titleSize: 14, //（可选项）数字类型；标题字体大小；默认：14
+                        titleColor: '#000' //（可选项）字符串类型；标题字体颜色，支持#、rgb、rgba；默认：#fff
+                    },
+                    content: { //（可选项）JSON 对象；文本内容配置，若不传则不显示该区域
+                        marginT: 20, //（可选项）数字类型；内容文本顶端与标题栏底端的距离，如果标题栏不存在，则是到窗口顶端的距离；默认：20
+                        marginB: 40, //（可选项）数字类型；内容文本底端与 left/right 顶端的距离，如果 left/right 都不存在，则是到对话框底端的距离；默认：20
+                        color: '#ff0103', //（可选项）字符串类型；内容文本字体颜色，支持 rgb、rgba、#；默认：#eee
+                        size: 12 //（可选项）数字类型：内容文本字体大小；默认：12
+                    },
+                    right: { //（可选项）JSON 对象；右边按钮样式配置，不传则不显示右边按钮
+                        marginB: 30, //（可选项）数字类型；右边按钮的下边距；默认：7
+                        marginL: 100, //（可选项）数字类型；右边按钮左边距；默认：10
+                        w: 100, //（可选项）数字类型；右边按钮的宽；默认：130
+                        h: 40, //（可选项）数字类型；右边按钮的高；默认：35
+                        corner: 10, //（可选项）数字类型；右边按钮圆角半径；默认：0.0
+                        bg: '#ff0103', //（可选项）字符串类型；右边按钮的背景，支持rgb、rgba、#、img；默认：'#e0e'
+                        color: '#fff', //（可选项）字符串类型；右边按钮标题字体颜色，支持rgb、rgba、#；默认：'#007FFF'
+                        size: 12 //（可选项）数字类型；右边按钮标题字体大小；默认：12
+                    }
+                }
+            }, function(ret) {
+                //打开网络设置
+                if (ret.eventType == 'right') {
+                    var openset = api.require('openSet');
+                    openset.open({
+                        id: 1
+                    });
+                }
+            });
+
+
+        }
+
+        // 初始化底部选项卡
+        function GetfunIniGroup() {
+            var eHeaderLis = $api.domAll('header li'),
+                frames = [];
+            // 准备框架组
+            frames.push({
+                name: '影视区',
+                url: './html/video.html',
+                bgColor: '#f5f5f5',
+                bounces: true
+            })
+            frames.push({
+                name: '直播',
+                url: './html/live.html',
+                bgColor: '#f5f5f5',
+                bounces: true
+            })
+            frames.push({
+                name: '抖音',
+                url: './html/frame3.html',
+                bgColor: '#f5f5f5',
+                bounces: true
+            })
+            frames.push({
+                name: '福利',
+                url: './html/frame3.html',
+                bgColor: '#f5f5f5',
+                bounces: true
+            })
+            frames.push({
+                    name: '用户中心',
+                    url: './html/my.html',
+                    bgColor: '#f5f5f5',
+                    bounces: true
+                })
+                // 打开框架组
+            api.openFrameGroup({
+                name: 'group',
+                scrollEnabled: false,
+                rect: {
+                    x: 0,
+                    y: $api.dom('header').offsetHeight,
+                    w: api.winWidth,
+                    h: 'auto',
+                    marginBottom: $api.dom('#footer').offsetHeight
+                },
+                index: 0,
+                frames: frames
+            }, function(ret, err) {
+
+            });
+
+
+        }
+    </script>
+
+</body>
+
+</html>

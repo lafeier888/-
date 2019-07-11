@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <!-- 引入vue -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+    <script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <title>Title</title>
+    <style>
+        body {
+            font-size: 0.9rem;
+        }
+
+        .info-margin-bottom {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body>
+<div id="app">
+    <el-row >
+        <el-col>
+            <img v-bind:src="videodata.pic" width="100%" height="190px"/>
+        </el-col>
+    </el-row>
+
+    <el-row style="padding: 1rem">
+        <el-col :span="24">
+            <el-row class="info-margin-bottom">
+                <el-col>片名: {{videodata.name}}</el-col>
+            </el-row>
+            <el-row class="info-margin-bottom">
+                <el-col>导演: {{videodata.director}}</el-col>
+            </el-row>
+            <el-row class="info-margin-bottom">
+                <el-col>介绍: {{videodata.des}}</el-col>
+            </el-row>
+            <el-row >
+                <el-col :span="8" v-for="link in videodata.playlist" class="info-margin-bottom">
+                    <el-button size="mini" v-on:click="changeurl(link.url)">{{link.tag}}</el-button>
+                </el-col>
+            </el-row>
+        </el-col>
+    </el-row>
+
+
+</div>
+
+</body>
+<script>
+
+</script>
+
+<script type="text/javascript" src="../script/api.js"></script>
+<script>
+    apiready = function () {
+        api.setScreenOrientation({
+            orientation: 'auto'
+        });
+        $api.fixStatusBar($api.dom('#app'));
+        data = api.pageParam.data;
+        var vm = new Vue({
+            el: '#app',
+            data: function () {
+                return {
+                    current_play_url: data.playlist[0].url,
+                    videodata: data
+                }
+            },
+            methods: {
+                changeurl(url) {
+                    this.current_play_url = url;
+                    api.openWin({
+                        name: 'videocloud',
+                        url: './videocloud.html',
+                        pageParam: {
+                            url:url
+                        }
+                    });
+
+                }
+            }
+        })
+
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            api.hideProgress();
+
+
+            api.closeWin({
+                name: 'videocloud_play'
+            });
+            api.toast({
+                msg: '已关闭',
+                duration: 2000,
+                location: 'bottom'
+            });
+
+
+        });
+
+    }
+</script>
+
+</html>
